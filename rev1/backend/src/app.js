@@ -1,0 +1,102 @@
+const express = require("express")
+const noteModel = require("./models/notes.model")
+const path = require("path")
+
+const cors = require("cors");
+
+const app = express()
+app.use(express.json())
+app.use(cors())
+app.use(express.static("./public"))
+app.use(express.urlencoded({ extended: true }))
+
+const notes = [{
+
+}]
+
+// app.get("/",(req,res)=>{
+//     res.send("Hello")
+// })
+
+// app.post("/notes",(req,res)=>{
+//     console.log(req.body)
+//     notes.push(req.body)
+//     res.status(200).json({
+//         message:"Notes Created"
+//     })
+// })
+
+// app.get("/notes",(req,res)=>{
+//     res.status(200).json({
+//         notes:notes
+//     })
+
+// })
+
+// app.delete("/notes/:id",(req,res)=>{
+//     console.log(req.params.id)
+//     delete notes[req.params.id]
+//     res.status(200).json({
+//         message:"Notes deleted"
+//     })
+// })
+
+// app.patch("/notes/:id",(req,res)=>{
+//     notes[req.params.id].description= req.body.description
+//     notes[req.params.id].title = req.body.title
+//     res.status(200).json({
+//         message:"Notes Updated"
+//     })
+//     console.log(req.params.id)
+// })
+
+app.post("/api/notes",async(req,res)=>{
+    const {title,description} = req.body
+    const note = await noteModel.create({
+        title,
+        description
+    })
+
+    res.status(200).json({
+        message:"Notes Created",
+        note
+    })
+ })
+
+ app.get("/api/notes",async(req,res)=>{
+    const notes = await noteModel.find()
+    res.status(200).json({
+        message:"Notes Fetched",
+        notes
+    })
+ })
+
+ app.delete("/api/notes/:id",async(req,res)=>{
+    const id = req.params.id
+
+    const deletedNotes = await noteModel.findByIdAndDelete(id)
+
+    res.status(200).json({
+        message:"Notes deletd",
+        note:deletedNotes
+    })
+ })
+ app.patch("/api/notes/:id",async(req,res)=>{
+    const id = req.params.id
+    const {title,description} = req.body
+    const updatedNotes = await noteModel.findByIdAndUpdate(id,{title,description})
+
+    res.status(200).json(
+        {
+            message:"Notes Updated",
+            note:updatedNotes
+        }
+    )
+
+ })
+
+ app.use("*name",(req,res)=>{
+    res.sendFile(path.join(__dirname ,"..","/public/index.html"))
+ })
+
+module.exports= app
