@@ -1,0 +1,176 @@
+const express = require("express");
+const userModel = require("../models/user.model");
+const crypto = require("crypto")
+const jwt = require("jsonwebtoken")
+
+const authRouter = express.Router();
+
+
+authRouter.post("/register", async (req, res) => {
+  const { username, email, password, bio, profileImage } = req.body;
+
+  // const isUserExistByEmail = await userModel.findOne({email})
+  // if(isUserExistByEmail){
+  //      return res.status(409).json(
+  //         {
+  //             message:"user alredy exist with same email"
+  //         }
+  //      )
+  // }
+  // const userExistByUserName = await userModel.findOne({username})
+  // if(userExistByUserName){
+  //     return res.status(409).json(
+  //         {
+  //             message:"user is alredy exist by username"
+  //         }
+  //     )
+  // }
+
+  const isUserAlredyExist = await userModel.findOne({
+    $or: [{ username }, { email }],
+  });
+
+  if(isUserAlredyExist){
+    return res.status(409).json(
+        {
+            message:"User alredy exist"  +(isUserAlredyExist.email ==email? "Email is aredy exist":"Username is alredy exist")
+        }
+    )
+  }
+
+  const hash = crypto.createHash("sha256").update(password).digest("hex")
+  const user = await userModel.create(
+    {
+        username,
+        email,
+        bio,
+        profileImage,
+        password:hash
+    }
+  )
+
+  const token = jwt.sign(
+    {
+        id:user._id,
+      
+    },process.env.JWT_SECRATE,{expiresIn:"1d"}
+  )
+   
+  res.cookie("token",token)
+
+  res.status( 201).json(
+    {
+        messag:"User Registerd Successfully",
+        user:{
+            email:user.email,
+            username:user.username,
+            bio:user.bio,
+            profileImage:user.profileImage
+        },
+    
+    }
+  )
+});
+
+module.exports = authRouter;
+
+
+// const express = require("express");
+// const userModel = require("../models/user.model");
+// const crypto = require("crypto");
+// const jwt = require("jsonwebtoken");
+
+// const authRouter = express.Router();
+
+// authRouter.post("/register", async (req, res) => {
+//   try {
+//     const { username, email, password, bio, profileImage } = req.body;
+
+//     // Check required fields
+//     if (!username || !email || !password) {
+//       return res.status(400).json({
+//         message: "Username, email and password are required",
+//       });
+//     }
+
+//     // Check if username or email already exists
+//     const existingUser = await userModel.findOne({
+//       $or: [{ username }, { email }],
+//     });
+
+//     if (existingUser) {
+//       if (existingUser.email === email) {
+//         return res.status(409).json({
+//           message: "Email is already registered",
+//         });
+//       }
+
+//       if (existingUser.username === username) {
+//         return res.status(409).json({
+//           message: "Username is already taken",
+//         });
+//       }
+//     }
+
+//     // Hash password
+//     const hash = crypto
+//       .createHash("sha256")
+//       .update(password)
+//       .digest("hex");
+
+//     // Create user
+//     const user = await userModel.create({
+//       username,
+//       email,
+//       bio,
+//       profileImage,
+//       password: hash,
+//     });
+
+//     // Check JWT secret
+//     if (!process.env.JWT_SECRET) {
+//       return res.status(500).json({
+//         message: "JWT secret is not configured",
+//       });
+//     }
+
+//     // Create JWT
+//     const token = jwt.sign(
+//       {
+//         id: user._id,
+//       },
+//       process.env.JWT_SECRATE,
+//       {
+//         expiresIn: "1d",
+//       }
+//     );
+
+//     // Store token in cookie
+//     res.cookie("token", token, {
+//       httpOnly: true,
+//       secure: process.env.NODE_ENV === "production",
+//       sameSite: "strict",
+//       maxAge: 24 * 60 * 60 * 1000,
+//     });
+
+//     // Send response
+//     return res.status(201).json({
+//       message: "User registered successfully",
+//       user: {
+//         id: user._id,
+//         username: user.username,
+//         email: user.email,
+//         bio: user.bio,
+//         profileImage: user.profileImage,
+//       },
+//     });
+//   } catch (error) {
+//     console.error(error);
+
+//     return res.status(500).json({
+//       message: "Internal server error",
+//     });
+//   }
+// });
+
+// module.exports = authRouter;
