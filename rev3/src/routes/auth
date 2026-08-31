@@ -1,0 +1,137 @@
+// const express = require("express");
+// const userModel = require("../model/user.model");
+// const jwt = require("jsonwebtoken");
+
+
+// const authRouter = express.Router();
+
+// // authRouter.post("/register", async (req, res) => {
+// //     try {
+// //         const { name, email, password } = req.body;
+
+// //         // Check all fields
+// //         if (!name || !email || !password) {
+// //             return res.status(400).json({
+// //                 message: "All fields are required"
+// //             });
+// //         }
+
+// //         // Check if user already exists
+// //         const userAlreadyExist = await userModel.findOne({
+// //             email: email
+// //         });
+
+// //         if (userAlreadyExist) {
+// //             return res.status(409).json({
+// //                 message: "User already exists"
+// //             });
+// //         }
+
+// //         // Hash password
+// //         const hashedPassword = await bcrypt.hash(password, 10);
+
+// //         // Create user
+// //         const user = await userModel.create({
+// //             name: name,
+// //             email: email,
+// //             password: hashedPassword
+// //         });
+
+// //         // Create JWT
+// //         const token = jwt.sign(
+// //             {
+// //                 id: user._id
+// //             },
+// //             process.env.JWT_SECRET,
+// //             {
+// //                 expiresIn: "1d"
+// //             }
+// //         );
+
+// //         return res.status(201).json({
+// //             message: "User registered successfully",
+// //             user: {
+// //                 id: user._id,
+// //                 name: user.name,
+// //                 email: user.email
+// //             },
+// //             token: token
+// //         });
+
+// //     } catch (error) {
+// //         console.log("Register Error:", error);
+
+// //         return res.status(500).json({
+// //             message: "Internal Server Error"
+// //         });
+// //     }
+// // });
+
+// authRouter.post("/register",async(req,res)=>{
+//     const {name,email,password} = req.body
+    
+//     const userAlreadyExist = await userModel.findOne({email})
+    
+//        if(userAlreadyExist){
+//         return res.status(409).json({
+//             message:"Alredy Exist"
+//         })
+//        }
+
+//     const user = await userModel.create(
+//         {
+//             name,
+//             password,
+//             email
+//         }
+//        )
+   
+//        const token = jwt.sign(
+//         {
+//             id:user._id
+//         },
+//         process.env.JWT_SECRATE
+//        )
+      
+//        res.cookie("jwt_token",token)
+
+//        res.status(200).json({
+//         message:"user is registerd",
+//         user,
+//         token
+//        })
+// })
+
+
+// authRouter.post("/login",async(req,res)=>{
+//     const {email,password} =req.body
+//    const user = await userModel.findOne({email})
+//   if(!user){
+//     return res.status(409).json({
+//         message:"User Not Found"
+//     })
+//   }
+
+//   const isPasswordCorrect =user.password===password
+//   if(!isPasswordCorrect){
+//     return res.status(401).json({
+//         message:"Invalid Credentials"
+//     })
+//   }
+
+  
+
+//    res.status(201).json({
+//     message:"Login Successfully",
+//     user
+//    })
+// })
+
+
+// authRouter.post("/protected",async(req,res)=>{
+//     console.log(req.cookies)
+//     res.status(200).json({
+//         messsage:"Cookies is"
+//     })
+// })
+// module.exports = authRouter;

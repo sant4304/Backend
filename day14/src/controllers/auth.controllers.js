@@ -20,8 +20,7 @@ async function registerController (req, res){
 
   if (isUserAlredyExist) {
     return (
-      res.status(409),
-      express.json({
+      res.status(409).json({
         message:
           "User alredy exist" +
           (isUserAlredyExist.email == email

@@ -1,0 +1,203 @@
+const express = require("express")
+const userModel = require("../models/user.model")
+const authRouter = express.Router()
+const jwt = require("jsonwebtoken")
+const crypto =require("crypto")
+authRouter.use(express.json())
+authRouter.post("/register",async(req,res)=>{
+    const {name ,email, password} = req.body
+
+    const isUserExist = await userModel.findOne({email})
+    if(isUserExist){
+        return res.status(409).json(
+            {
+                message:"User Already Exist"
+            }
+        )
+    }
+
+      const hash = crypto.createHash("sha256").update(password).digest("hex")
+    const user = await userModel.create({
+      name,
+      email,
+      password:hash
+    })
+    
+    const token = jwt.sign(
+        {
+            id:user._id
+        },
+        process.env.JWT_SECRATE,{expiresIn:"2h"}
+        
+    )
+
+    res.cookie("jwt_token",token)
+   res.status(200).json(
+    {
+        message:"User registerd successfully",
+        user:{
+            name:user.name,
+            email:user.email
+        },
+        token   
+    }
+   )    
+
+})
+
+authRouter.get("/get-me",async(req,res)=>{
+    const token = req.cookies.jwt_token
+    const decoded = jwt.verify(token,process.env.JWT_SECRATE)
+    console.log(decoded)
+    const user = await userModel.findById(decoded.id)
+    res.json({
+        name:user.name,
+        email:user.email
+    })
+})
+
+
+// authRouter.get("/get-me", async (req, res) => {
+//     try {
+//         const token = req.cookies.jwt_token;
+
+//         if (!token) {
+//             return res.status(401).json({
+//                 message: "Token not found"
+//             });
+//         }
+
+//         const decoded = jwt.verify(
+//             token,
+//             process.env.JWT_SECRATE
+//         );
+
+//         console.log(decoded);
+
+//         res.status(200).json({
+//             message: "User authenticated",
+//             user: decoded
+//         });
+
+//     } catch (error) {
+//         console.log(error);
+
+//         res.status(401).json({
+//             message: "Invalid or expired token"
+//         });
+//     }
+// });
+module.exports = authRouter
+
+/************************************************/ 
+
+
+
+// const express = require("express");
+// const userModel = require("../models/user.model");
+// const authRouter = express.Router();
+// const jwt = require("jsonwebtoken");
+// const crypto = require("crypto");
+
+
+// // REGISTER
+// authRouter.post("/register", async (req, res) => {
+//     try {
+//         const { name, email, password } = req.body;
+
+//         // Check user already exists
+//         const isUserExist = await userModel.findOne({ email });
+
+//         if (isUserExist) {
+//             return res.status(409).json({
+//                 message: "User Already Exist"
+//             });
+//         }
+
+//         // Hash password
+//         const hash = crypto
+//             .createHash("sha256")
+//             .update(password)
+//             .digest("hex");
+
+//         // Create user
+//         const user = await userModel.create({
+//             name,
+//             email,
+//             password: hash
+//         });
+
+//         // Create JWT
+//         const token = jwt.sign(
+//             {
+//                 id: user._id
+//             },
+//             process.env.JWT_SECRATE,
+//             {
+//                 expiresIn: "2h"
+//             }
+//         );
+
+//         // Store token in cookie
+//         res.cookie("jwt_token", token, {
+//             httpOnly: true
+//         });
+
+//         return res.status(200).json({
+//             message: "User registered successfully",
+//             user: {
+//                 name: user.name,
+//                 email: user.email
+//             }
+//         });
+
+//     } catch (error) {
+//         console.log(error);
+
+//         return res.status(500).json({
+//             message: "Internal Server Error"
+//         });
+//     }
+// });
+
+
+// // GET ME
+// authRouter.get("/get-me", async (req, res) => {
+//     try {
+
+//         // Get token from cookie
+//         const token = req.cookies.jwt_token;
+
+//         console.log("Token:", token);
+
+//         // Check token
+//         if (!token) {
+//             return res.status(401).json({
+//                 message: "Token not found"
+//             });
+//         }
+
+//         // Verify token
+//         const decoded = jwt.verify(
+//             token,
+//             process.env.JWT_SECRATE
+//         );
+
+//         console.log("Decoded:", decoded);
+
+//         return res.status(200).json({
+//             message: "User authenticated",
+//             user: decoded
+//         });
+
+//     } catch (error) {
+//         console.log("JWT Error:", error.message);
+
+//         return res.status(401).json({
+//             message: "Invalid or expired token"
+//         });
+//     }
+// });
+
+
+// module.exports = authRouter;
