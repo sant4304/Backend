@@ -1,0 +1,20 @@
+.button{
+    background-color: #dd4200;
+    border: none;
+    color: white;
+    padding-inline: 1rem;
+    padding-block: 0.5rem;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    outline: none;
+    font-size: 16px;
+
+    border-radius: 0.5rem;
+    cursor: pointer;
+    
+     transition: transform 0.1s ease;
+      &:active {
+        transform: scale(0.9);
+    }
+}
