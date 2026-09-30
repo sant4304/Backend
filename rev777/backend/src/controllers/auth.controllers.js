@@ -89,6 +89,8 @@ async function getmeController(req,res){
   )
 }
 
+
+
 async function userController(req,res){
  const user = await userModel.find()
  res.status(201).json(

@@ -1,49 +1,75 @@
-import React, { useState } from 'react'
-import axios from "axios"
-import { useAuth } from '../hooks/useAuth'
+import React, { useState } from "react";
+import "../style/form.scss"
+import { useAuth } from "../hooks/useAuth";
+import { useNavigate ,Link} from "react-router";
 
 const Login = () => {
+  const navigate = useNavigate();
 
-    const [username, setUsername] = useState("")
-    const [password, setPassword] = useState("")
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
-    const {user,loading,handleLogin} = useAuth()
-  
-    const handleSubmit =(e)=>{
-        e.preventDefault();
+  const { user, loading, handleLogin } = useAuth();
 
-        // axios.post("http://localhost:3000/api/auth/login",{
-        //     username,
-        //     password
-        // },
-        //  {
-        //     withCredentials:true
-        //  })
-        //  .then((res)=>{
-        //     console.log(res.data)
-        //  })
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-        handleLogin(username,password)
-        .then((res)=>{
-            console.log(res)
-        })
-    }
+    // axios.post("http://localhost:3000/api/auth/login",{
+    //     username,
+    //     password
+    // },
+    //  {
+    //     withCredentials:true
+    //  })
+    //  .then((res)=>{
+    //     console.log(res.data)
+    //  })
+    await handleLogin(username, password);
+    console.log("User Logged in");
+    navigate("/");
+    // handleLogin(username,password)
+    // .then((res)=>{
+    //     console.log(res)
+    // })
+  };
 
-     
+  if (loading) {
+    return (
+      <main>
+        <h1>Loading... </h1>
+      </main>
+    );
+  }
 
   return (
     <main>
-        <form action="" onSubmit={(e)=>{handleSubmit(e)}}>
-            <input 
-            onChange={(e)=>{setUsername(e.target.value)}}
-            type="text" name="username" id="username" placeholder='Enter the username'/>
-            <input 
-            onChange={(e)=>{setPassword(e.target.value)}}
-            type="password" name='password' id="password" placeholder='Enter password'/>
-            <button type='submit'>Login</button>
-        </form>
-    </main>
-  )
-}
+                <div className="form-container">
+          <h1>Login</h1>
+          <form action="" onSubmit={handleSubmit}>
 
-export default Login
+             <input 
+             onInput={(e)=>{setUsername(e.target.value)}}
+             type="text" 
+             name='username' 
+             id='username' 
+             placeholder='Enter username'
+             required/>
+
+             <input 
+             onInput={(e)=>{setPassword(e.target.value)}}
+             type="password" 
+             name='password' 
+             id='password' 
+             placeholder='Enter password' 
+             required/>
+
+             <button type='submit' className='button primary-button'>Login</button>
+
+          </form>
+          <p>Don't have an account ? <Link to={"/register"}>Create One.</Link></p>
+        </div>
+    </main>
+  );
+};
+
+export default Login;
