@@ -1,0 +1,22 @@
+{
+  "name": "day41",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@langchain/community": "^1.1.29",
+    "@langchain/core": "^1.2.17",
+    "@langchain/mistralai": "^1.2.0",
+    "@langchain/textsplitters": "^1.0.2",
+    "@pinecone-database/pinecone": "^9.0.0",
+    "dotenv": "^16.6.1",
+    "pdf-parse": "^2.4.5"
+  }
+}
